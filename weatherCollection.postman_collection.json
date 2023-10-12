@@ -1,0 +1,98 @@
+{
+	"info": {
+		"_postman_id": "0b8f6150-4d5f-4098-8471-597c14c2ab87",
+		"name": "weatherCollection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30442155"
+	},
+	"item": [
+		{
+			"name": "apiHome",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://laravel-weather-app.test/api/home",
+					"protocol": "http",
+					"host": [
+						"laravel-weather-app",
+						"test"
+					],
+					"path": [
+						"api",
+						"home"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "apiLogin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://laravel-weather-app.test/api/login?email=apitest5@test.com&password=12345678",
+					"protocol": "http",
+					"host": [
+						"laravel-weather-app",
+						"test"
+					],
+					"path": [
+						"api",
+						"login"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "apitest5@test.com"
+						},
+						{
+							"key": "password",
+							"value": "12345678"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "apiRegister",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://laravel-weather-app.test/api/register?email=apitest5@test.com&password=12345678&name=Api test 5&password_confirmation=12345678",
+					"protocol": "http",
+					"host": [
+						"laravel-weather-app",
+						"test"
+					],
+					"path": [
+						"api",
+						"register"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "apitest5@test.com"
+						},
+						{
+							"key": "password",
+							"value": "12345678"
+						},
+						{
+							"key": "name",
+							"value": "Api test 5"
+						},
+						{
+							"key": "password_confirmation",
+							"value": "12345678"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

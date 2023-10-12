@@ -1,0 +1,119 @@
+﻿version: '3.8'
+
+networks:
+    frontend:
+        driver: bridge
+    backend:
+        driver: bridge
+
+services:
+    ws:
+        container_name: app_weather_ws
+        environment:
+            - LANG=en_US.UTF-8
+            - LC_ALL=
+            - LANGUAGE=en_US.UTF-8
+            - LC_CTYPE=en_US.UTF-8
+        build:
+            dockerfile: docker/php82/workspace/Dockerfile
+            context: .
+            args:
+                - INSTALL_XDEBUG=true
+        ports:
+            - "2222:22"
+            - "9000"
+        volumes:
+            - ./:/var/www/laravel-weather-app:cached
+            - ./docker/data/log:/var/log:cached
+            - ./docker/data/tmp:/tmp
+        networks:
+            - backend
+        tty: true
+
+    fpm:
+        container_name: app_weather_fpm
+        environment:
+            - LANG=en_US.UTF-8
+            - LC_ALL=
+            - LANGUAGE=en_US.UTF-8
+            - LC_CTYPE=en_US.UTF-8
+            - PHP_IDE_CONFIG=serverName=local
+        build:
+            dockerfile: docker/php82/fpm/Dockerfile
+            context: .
+            args:
+                - INSTALL_XDEBUG=true
+        expose:
+            - 9000
+        volumes:
+            - ./:/var/www/laravel-weather-app:cached
+            - ./docker/data/log:/var/log:cached
+            - ./docker/data/tmp:/tmp
+            - ./docker/php82/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+        networks:
+            - backend
+        extra_hosts:
+            - host.docker.internal:host-gateway
+
+    memcache:
+        container_name: app_weather_memcache
+        image: memcached:1.6.19
+        ports:
+            - "11211:11211"
+        networks:
+            - backend
+
+    redis:
+        container_name: app_weather_redis
+        image: redis:latest
+        user: "1000:1000"
+        volumes:
+            - ./docker/data/redis-data:/data
+            - ./docker/redis/config/:/usr/local/etc/redis/
+        command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+        environment:
+            - REDIS_PASSWORD=12345
+        ports:
+            - "6379:6379"
+        sysctls:
+            - net.core.somaxconn=511
+        cap_add:
+            - SYS_RESOURCE
+        security_opt:
+            - seccomp:unconfined
+        networks:
+            - backend
+
+    nginx:
+        container_name: app_weather_nginx
+        image: nginx:latest
+        ports:
+            - "80:80"
+        depends_on:
+            - fpm
+        volumes:
+            - ./docker/nginx/config/:/etc/nginx/conf.d/
+            - ./:/var/www/laravel-weather-app:cached
+            - ./docker/data/log:/var/log:cached
+        networks:
+            - backend
+            - frontend
+
+    mysql:
+        container_name: app_weather_mysql
+        environment:
+            - MYSQL_DATABASE=example_db
+            - MYSQL_ROOT_PASSWORD=1
+            - MYSQL_USER=admin
+            - MYSQL_PASSWORD=12345
+        build:
+            dockerfile: docker/mysql/Dockerfile
+            context: .
+        volumes:
+            - ./docker/data/db:/var/lib/mysql
+            - ./docker/data/log:/var/log:cached
+        ports:
+            - "3306:3306"
+        networks:
+            - backend
+            - frontend
